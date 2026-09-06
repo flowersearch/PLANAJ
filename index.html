@@ -169,6 +169,7 @@
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .tag {
@@ -179,6 +180,13 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s ease;
+        }
+
+        .tag:active {
+            transform: scale(0.95);
         }
 
         .tag-main {
@@ -187,10 +195,18 @@
             border: 1.5px solid #91d5ff;
         }
 
+        .tag-main:hover {
+            background-color: #bae7ff;
+        }
+
         .tag-sub {
             background-color: #f9f0ff;
             color: #722ed1;
             border: 1.5px solid #d3ade6;
+        }
+
+        .tag-sub:hover {
+            background-color: #efdbff;
         }
 
         .score-badge {
@@ -218,7 +234,7 @@
 
     <div class="controls">
         <div class="search-box">
-            <input type="text" id="searchInput" onkeyup="filterMembers()" placeholder="🔍 일원 닉네임 또는 꽃 이름 검색...">
+            <input type="text" id="searchInput" oninput="filterMembers()" placeholder="🔍 일원 닉네임 또는 꽃 이름 검색...">
         </div>
 
         <div class="day-buttons">
@@ -244,7 +260,8 @@
 </div>
 
 <script>
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxVELThs8uBQsbpf5Eh4DVpYZ-51UlOJcL_H_0IyPVxwYA8zJ8gDNgT7IKPN-NxafWoPg/exec";
+    // 본인의 배포된 구글 앱스 스크립트 웹앱 URL 입력
+    const GAS_WEB_APP_URL = "여기에_새로운_웹앱_URL을_넣어주세요";
 
     let globalData = [];
     let currentDay = 1;
@@ -255,14 +272,19 @@
 
     function fetchData() {
         fetch(GAS_WEB_APP_URL)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("네트워크 응답 오류");
+                }
+                return response.json();
+            })
             .then(data => {
                 globalData = data;
                 renderMembers();
             })
             .catch(error => {
                 console.error("데이터 로드 오류:", error);
-                document.getElementById('memberList').innerHTML = '<div class="loading">데이터를 불러오지 못했습니다. Google Apps Script 배포 상태를 확인해 주세요.</div>';
+                document.getElementById('memberList').innerHTML = '<div class="loading">데이터를 불러오지 못했습니다. Google Apps Script 배포 상태를 확인해 주세요. 🌸</div>';
             });
     }
 
@@ -314,9 +336,48 @@
         renderMembers();
     }
 
+    function filterMembers() {
+        renderMembers();
+    }
+
+    function copyFlowerName(flowerName) {
+        const textToCopy = `${flowerName}🧡`;
+
+        copyToClipboard(textToCopy, function() {
+            alert(`"${textToCopy}" 문구가 클립보드에 복사되었습니다! 🌸`);
+        });
+    }
+
+    function copyToClipboard(text, callback) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(callback).catch(() => {
+                fallbackCopy(text, callback);
+            });
+        } else {
+            fallbackCopy(text, callback);
+        }
+    }
+
+    function fallbackCopy(text, callback) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            callback();
+        } catch (err) {
+            prompt("아래 문구를 직접 복사해 주세요:", text);
+        }
+        document.body.removeChild(textArea);
+    }
+
     function renderMembers() {
+        const query = document.getElementById('searchInput').value.replace(/\s+/g, '').toLowerCase();
         const listContainer = document.getElementById('memberList');
-        const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
         listContainer.innerHTML = '';
 
         if (!globalData || globalData.length === 0) {
@@ -324,39 +385,76 @@
             return;
         }
 
+        const memberCardsHtml = [];
+
         globalData.forEach(member => {
-            const hasName = member.name.toLowerCase().includes(searchText);
-            const hasMain = member.top1_flowers.some(f => f.name.toLowerCase().includes(searchText));
-            const hasSub = (currentDay >= 4) && member.top2_flowers.some(f => f.name.toLowerCase().includes(searchText));
+            const validMainFlowers = member.top1_flowers || [];
+            const validSubFlowers = member.top2_flowers || [];
 
-            if (searchText && !hasName && !hasMain && !hasSub) return;
+            const hasMain = validMainFlowers.length > 0;
+            const hasSub = validSubFlowers.length > 0;
 
-            const card = document.createElement('div');
-            card.className = 'member-card';
+            let showMain = hasMain;
+            let showSub = (currentDay >= 4) && hasSub;
+
+            const cleanMemberName = (member.name || '').replace(/\s+/g, '').toLowerCase();
+
+            if (query !== '') {
+                const nameMatches = cleanMemberName.includes(query);
+                const mainMatches = hasMain && validMainFlowers.some(f => f.name.replace(/\s+/g, '').toLowerCase().includes(query));
+                const subMatches = showSub && validSubFlowers.some(f => f.name.replace(/\s+/g, '').toLowerCase().includes(query));
+
+                if (!nameMatches && !mainMatches && !subMatches) {
+                    return;
+                }
+
+                if (!nameMatches) {
+                    showMain = hasMain && validMainFlowers.some(f => f.name.replace(/\s+/g, '').toLowerCase().includes(query));
+                    showSub = showSub && validSubFlowers.some(f => f.name.replace(/\s+/g, '').toLowerCase().includes(query));
+                }
+            }
+
+            if (!showMain && !showSub) return;
 
             let tagsHtml = '';
 
-            member.top1_flowers.forEach(f => {
-                tagsHtml += `<span class="tag tag-main">★ ${f.name} <span class="score-badge">${f.score}점</span></span>`;
-            });
-
-            if (currentDay >= 4) {
-                member.top2_flowers.forEach(f => {
-                    tagsHtml += `<span class="tag tag-sub">보조: ${f.name} <span class="score-badge">${f.score}점</span></span>`;
+            // 최고점 그룹 꽃태그 전체 출력
+            if (showMain) {
+                validMainFlowers.forEach(f => {
+                    const cleanFlowerName = f.name.replace(/\s+/g, '').toLowerCase();
+                    const safeFlowerName = f.name.replace(/'/g, "\\'");
+                    if (query === '' || cleanMemberName.includes(query) || cleanFlowerName.includes(query)) {
+                        tagsHtml += `<span class="tag tag-main" onclick="copyFlowerName('${safeFlowerName}')">★ ${f.name} <span class="score-badge">${f.score}점</span></span>`;
+                    }
                 });
             }
 
-            card.innerHTML = `
-                <div class="member-name"><span class="member-icon">🌸</span> ${member.name}</div>
-                <div class="flower-tags">${tagsHtml}</div>
-            `;
+            // 두번째 높은 점수 그룹(보조꽃) 전체 출력
+            if (showSub) {
+                validSubFlowers.forEach(f => {
+                    const cleanFlowerName = f.name.replace(/\s+/g, '').toLowerCase();
+                    const safeFlowerName = f.name.replace(/'/g, "\\'");
+                    if (query === '' || cleanMemberName.includes(query) || cleanFlowerName.includes(query)) {
+                        tagsHtml += `<span class="tag tag-sub" onclick="copyFlowerName('${safeFlowerName}')">보조: ${f.name} <span class="score-badge">${f.score}점</span></span>`;
+                    }
+                });
+            }
 
-            listContainer.appendChild(card);
+            if (tagsHtml !== '') {
+                memberCardsHtml.push(`
+                    <div class="member-card">
+                        <div class="member-name"><span class="member-icon">🌸</span> ${member.name}</div>
+                        <div class="flower-tags">${tagsHtml}</div>
+                    </div>
+                `);
+            }
         });
-    }
 
-    function filterMembers() {
-        renderMembers();
+        if (memberCardsHtml.length > 0) {
+            listContainer.innerHTML = memberCardsHtml.join('');
+        } else {
+            listContainer.innerHTML = '<div class="loading">검색 결과가 없습니다. 🌸</div>';
+        }
     }
 </script>
 
