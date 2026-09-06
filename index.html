@@ -180,6 +180,13 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s ease;
+        }
+
+        .tag:active {
+            transform: scale(0.95);
         }
 
         .tag-main {
@@ -188,10 +195,18 @@
             border: 1.5px solid #91d5ff;
         }
 
+        .tag-main:hover {
+            background-color: #bae7ff;
+        }
+
         .tag-sub {
             background-color: #f9f0ff;
             color: #722ed1;
             border: 1.5px solid #d3ade6;
+        }
+
+        .tag-sub:hover {
+            background-color: #efdbff;
         }
 
         .score-badge {
@@ -324,6 +339,43 @@
         renderMembers();
     }
 
+    // 꽃 이름 + 🧡 클립보드 복사 함수
+    function copyFlowerName(flowerName) {
+        const textToCopy = `${flowerName}🧡`;
+
+        copyToClipboard(textToCopy, function() {
+            alert(`"${textToCopy}" 문구가 클립보드에 복사되었습니다! 🌸`);
+        });
+    }
+
+    // 모바일/PC 호환 클립보드 처리 함수
+    function copyToClipboard(text, callback) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(callback).catch(() => {
+                fallbackCopy(text, callback);
+            });
+        } else {
+            fallbackCopy(text, callback);
+        }
+    }
+
+    function fallbackCopy(text, callback) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            callback();
+        } catch (err) {
+            prompt("아래 문구를 직접 복사해 주세요:", text);
+        }
+        document.body.removeChild(textArea);
+    }
+
     function renderMembers() {
         const query = document.getElementById('searchInput').value.replace(/\s+/g, '').toLowerCase();
         const listContainer = document.getElementById('memberList');
@@ -367,8 +419,9 @@
             if (showMain) {
                 member.top1_flowers.forEach(f => {
                     const cleanFlowerName = f.name.replace(/\s+/g, '').toLowerCase();
+                    const safeFlowerName = f.name.replace(/'/g, "\\'");
                     if (query === '' || cleanMemberName.includes(query) || cleanFlowerName.includes(query)) {
-                        tagsHtml += `<span class="tag tag-main">★ ${f.name} <span class="score-badge">${f.score}점</span></span>`;
+                        tagsHtml += `<span class="tag tag-main" onclick="copyFlowerName('${safeFlowerName}')">★ ${f.name} <span class="score-badge">${f.score}점</span></span>`;
                     }
                 });
             }
@@ -376,8 +429,9 @@
             if (showSub) {
                 member.top2_flowers.forEach(f => {
                     const cleanFlowerName = f.name.replace(/\s+/g, '').toLowerCase();
+                    const safeFlowerName = f.name.replace(/'/g, "\\'");
                     if (query === '' || cleanMemberName.includes(query) || cleanFlowerName.includes(query)) {
-                        tagsHtml += `<span class="tag tag-sub">보조: ${f.name} <span class="score-badge">${f.score}점</span></span>`;
+                        tagsHtml += `<span class="tag tag-sub" onclick="copyFlowerName('${safeFlowerName}')">보조: ${f.name} <span class="score-badge">${f.score}점</span></span>`;
                     }
                 });
             }
