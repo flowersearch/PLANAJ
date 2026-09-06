@@ -341,7 +341,7 @@
         renderMembers();
     }
 
-    // 닉네임에서 특수문자, 괄호, 칭호 등을 제외하고 순수 이름만 추출하는 함수
+    // 닉네임 정제 함수 (괄호, 수식어 제거 후 순수 이름만 추출)
     function cleanNickName(rawName) {
         if (!rawName) return '';
         let cleaned = rawName.replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '');
@@ -349,33 +349,40 @@
         return match ? match[0] : rawName.trim();
     }
 
-    // [방법 1] 문구 자동 복사 후 오픈채팅방 이동 함수
+    // 클립보드 복사 전용 실행 함수
     function shareToKakao(flowerName, memberName) {
         const pureName = cleanNickName(memberName);
         const messageText = `${flowerName}🧡 @${pureName}`;
 
+        // 텍스트 복사 처리
+        copyToClipboard(messageText, function() {
+            alert(`"${messageText}" 문구가 복사되었습니다!\n오픈카톡방 채팅창에 붙여넣어 주세요. 🌸`);
+            window.location.href = OPEN_CHAT_URL;
+        });
+    }
+
+    // 모바일 브라우저 호환성을 포함한 복사 함수
+    function copyToClipboard(text, callback) {
         if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(messageText).then(() => {
-                alert(`"${messageText}" 문구가 복사되었습니다!\n오픈카톡방에 붙여넣기 해주세요. 🌸`);
-                window.location.href = OPEN_CHAT_URL;
-            }).catch(() => {
-                fallbackCopyText(messageText);
+            navigator.clipboard.writeText(text).then(callback).catch(() => {
+                fallbackCopy(text, callback);
             });
         } else {
-            fallbackCopyText(messageText);
+            fallbackCopy(text, callback);
         }
     }
 
-    // 호환성용 백업 복사 함수
-    function fallbackCopyText(text) {
+    function fallbackCopy(text, callback) {
         const textArea = document.createElement("textarea");
         textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
         document.body.appendChild(textArea);
+        textArea.focus();
         textArea.select();
         try {
             document.execCommand('copy');
-            alert(`"${text}" 문구가 복사되었습니다!\n오픈카톡방에 붙여넣기 해주세요. 🌸`);
-            window.location.href = OPEN_CHAT_URL;
+            callback();
         } catch (err) {
             prompt("아래 문구를 복사해 주세요:", text);
             window.location.href = OPEN_CHAT_URL;
