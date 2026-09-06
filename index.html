@@ -265,7 +265,8 @@
 
 <script>
     const KAKAO_JAVASCRIPT_KEY = "115a57bc771889282955a53f6cb47484"; 
-    
+    const OPEN_CHAT_URL = "https://open.kakao.com/o/g5PJd9Ai";
+
     if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
         Kakao.init(KAKAO_JAVASCRIPT_KEY);
     }
@@ -349,17 +350,14 @@
         renderMembers();
     }
 
-    // 닉네임에서 특수문자, 괄호, 칭호 등을 제외하고 순수 이름만 추출하는 함수
     function cleanNickName(rawName) {
         if (!rawName) return '';
-        // 괄호 내용 제거 -> 알파벳, 한글, 숫자만 추출
         let cleaned = rawName.replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '');
         let match = cleaned.match(/[가-힣a-zA-Z0-9]+/);
         return match ? match[0] : rawName.trim();
     }
 
     function shareToKakao(flowerName, memberName) {
-        // 순수 닉네임만 정제 후 @태그 구성
         const pureName = cleanNickName(memberName);
         const messageText = `${flowerName}🧡 @${pureName}`;
 
@@ -368,9 +366,18 @@
                 objectType: 'text',
                 text: messageText,
                 link: {
-                    mobileWebUrl: window.location.href,
-                    webUrl: window.location.href,
+                    mobileWebUrl: OPEN_CHAT_URL,
+                    webUrl: OPEN_CHAT_URL,
                 },
+                buttons: [
+                    {
+                        title: '오픈채팅방 바로가기 🌸',
+                        link: {
+                            mobileWebUrl: OPEN_CHAT_URL,
+                            webUrl: OPEN_CHAT_URL,
+                        },
+                    },
+                ],
             });
         } else {
             navigator.clipboard.writeText(messageText).then(() => {
@@ -421,7 +428,6 @@
 
             let tagsHtml = '';
 
-            // 작은따옴표(') 따옴표로 인한 JS 오류 방지 처리
             const safeMemberName = (member.name || '').replace(/'/g, "\\'");
 
             if (showMain) {
