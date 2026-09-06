@@ -261,7 +261,7 @@
 
 <script>
     // 새로운 웹앱 URL 반영
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyfF0Dq26zqlO-I4lr2E24fMYuzv16O994fAfzb6WZNZ67-nUzZC4pDeCuxqR2iSInRaA/exec";
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxGmhBZ2rEhW8VV4WpaLdONbNiqIzrTn492ls6XkmNyVTAccNzZ6UbeHT5hw9cL8hTRmA/exec";
 
     let globalData = [];
     let currentDay = 1;
@@ -388,9 +388,8 @@
         const memberCardsHtml = [];
 
         globalData.forEach(member => {
-            // 14점 이하 제외 필터링 (15점 이상만 통과)
-            const validMainFlowers = (member.top1_flowers || []).filter(f => Number(f.score) > 14);
-            const validSubFlowers = (member.top2_flowers || []).filter(f => Number(f.score) > 14);
+            const validMainFlowers = member.top1_flowers || [];
+            const validSubFlowers = member.top2_flowers || [];
 
             const hasMain = validMainFlowers.length > 0;
             const hasSub = validSubFlowers.length > 0;
