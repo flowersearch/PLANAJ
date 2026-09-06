@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>애진화방 경기 전략 가이드</title>
-
     <style>
         :root {
             --primary-color: #ff6b81;
@@ -181,13 +180,6 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.15s ease;
-        }
-
-        .tag:active {
-            transform: scale(0.95);
         }
 
         .tag-main {
@@ -196,18 +188,10 @@
             border: 1.5px solid #91d5ff;
         }
 
-        .tag-main:hover {
-            background-color: #bae7ff;
-        }
-
         .tag-sub {
             background-color: #f9f0ff;
             color: #722ed1;
             border: 1.5px solid #d3ade6;
-        }
-
-        .tag-sub:hover {
-            background-color: #efdbff;
         }
 
         .score-badge {
@@ -261,7 +245,6 @@
 </div>
 
 <script>
-    const OPEN_CHAT_URL = "https://open.kakao.com/o/g5PJd9Ai";
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyR5BOqYecqHa3WvIF5CHxACUBQosSVqWDyBNThghzcfaWrZXV5RUnXTgCBaSjm5ozxvw/exec";
 
     let globalData = [];
@@ -341,55 +324,6 @@
         renderMembers();
     }
 
-    // 닉네임 정제 함수 (괄호, 수식어 제거 후 순수 이름만 추출)
-    function cleanNickName(rawName) {
-        if (!rawName) return '';
-        let cleaned = rawName.replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '');
-        let match = cleaned.match(/[가-힣a-zA-Z0-9]+/);
-        return match ? match[0] : rawName.trim();
-    }
-
-    // 클립보드 복사 전용 실행 함수
-    function shareToKakao(flowerName, memberName) {
-        const pureName = cleanNickName(memberName);
-        const messageText = `${flowerName}🧡 @${pureName}`;
-
-        // 텍스트 복사 처리
-        copyToClipboard(messageText, function() {
-            alert(`"${messageText}" 문구가 복사되었습니다!\n오픈카톡방 채팅창에 붙여넣어 주세요. 🌸`);
-            window.location.href = OPEN_CHAT_URL;
-        });
-    }
-
-    // 모바일 브라우저 호환성을 포함한 복사 함수
-    function copyToClipboard(text, callback) {
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(text).then(callback).catch(() => {
-                fallbackCopy(text, callback);
-            });
-        } else {
-            fallbackCopy(text, callback);
-        }
-    }
-
-    function fallbackCopy(text, callback) {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.style.position = "fixed";
-        textArea.style.opacity = "0";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-            document.execCommand('copy');
-            callback();
-        } catch (err) {
-            prompt("아래 문구를 복사해 주세요:", text);
-            window.location.href = OPEN_CHAT_URL;
-        }
-        document.body.removeChild(textArea);
-    }
-
     function renderMembers() {
         const query = document.getElementById('searchInput').value.replace(/\s+/g, '').toLowerCase();
         const listContainer = document.getElementById('memberList');
@@ -430,14 +364,11 @@
 
             let tagsHtml = '';
 
-            const safeMemberName = (member.name || '').replace(/'/g, "\\'");
-
             if (showMain) {
                 member.top1_flowers.forEach(f => {
                     const cleanFlowerName = f.name.replace(/\s+/g, '').toLowerCase();
-                    const safeFlowerName = f.name.replace(/'/g, "\\'");
                     if (query === '' || cleanMemberName.includes(query) || cleanFlowerName.includes(query)) {
-                        tagsHtml += `<span class="tag tag-main" onclick="shareToKakao('${safeFlowerName}', '${safeMemberName}')">★ ${f.name} <span class="score-badge">${f.score}점</span></span>`;
+                        tagsHtml += `<span class="tag tag-main">★ ${f.name} <span class="score-badge">${f.score}점</span></span>`;
                     }
                 });
             }
@@ -445,9 +376,8 @@
             if (showSub) {
                 member.top2_flowers.forEach(f => {
                     const cleanFlowerName = f.name.replace(/\s+/g, '').toLowerCase();
-                    const safeFlowerName = f.name.replace(/'/g, "\\'");
                     if (query === '' || cleanMemberName.includes(query) || cleanFlowerName.includes(query)) {
-                        tagsHtml += `<span class="tag tag-sub" onclick="shareToKakao('${safeFlowerName}', '${safeMemberName}')">보조: ${f.name} <span class="score-badge">${f.score}점</span></span>`;
+                        tagsHtml += `<span class="tag tag-sub">보조: ${f.name} <span class="score-badge">${f.score}점</span></span>`;
                     }
                 });
             }
