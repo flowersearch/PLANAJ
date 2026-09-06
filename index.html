@@ -169,7 +169,6 @@
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
-            align-items: center;
         }
 
         .tag {
@@ -219,7 +218,7 @@
 
     <div class="controls">
         <div class="search-box">
-            <input type="text" id="searchInput" oninput="filterMembers()" placeholder="🔍 일원 닉네임 또는 꽃 이름 검색...">
+            <input type="text" id="searchInput" onkeyup="filterMembers()" placeholder="🔍 일원 닉네임 또는 꽃 이름 검색...">
         </div>
 
         <div class="day-buttons">
@@ -245,7 +244,7 @@
 </div>
 
 <script>
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyR5BOqYecqHa3WvIF5CHxACUBQosSVqWDyBNThghzcfaWrZXV5RUnXTgCBaSjm5ozxvw/exec";
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxVELThs8uBQsbpf5Eh4DVpYZ-51UlOJcL_H_0IyPVxwYA8zJ8gDNgT7IKPN-NxafWoPg/exec";
 
     let globalData = [];
     let currentDay = 1;
@@ -256,19 +255,14 @@
 
     function fetchData() {
         fetch(GAS_WEB_APP_URL)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("네트워크 응답 오류");
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 globalData = data;
                 renderMembers();
             })
             .catch(error => {
                 console.error("데이터 로드 오류:", error);
-                document.getElementById('memberList').innerHTML = '<div class="loading">데이터를 불러오지 못했습니다. Google Apps Script 배포 상태를 확인해 주세요. 🌸</div>';
+                document.getElementById('memberList').innerHTML = '<div class="loading">데이터를 불러오지 못했습니다. Google Apps Script 배포 상태를 확인해 주세요.</div>';
             });
     }
 
@@ -320,13 +314,9 @@
         renderMembers();
     }
 
-    function filterMembers() {
-        renderMembers();
-    }
-
     function renderMembers() {
-        const query = document.getElementById('searchInput').value.replace(/\s+/g, '').toLowerCase();
         const listContainer = document.getElementById('memberList');
+        const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
         listContainer.innerHTML = '';
 
         if (!globalData || globalData.length === 0) {
@@ -334,69 +324,39 @@
             return;
         }
 
-        const memberCardsHtml = [];
-
         globalData.forEach(member => {
-            const hasMain = member.top1_flowers && member.top1_flowers.length > 0;
-            const hasSub = member.top2_flowers && member.top2_flowers.length > 0;
+            const hasName = member.name.toLowerCase().includes(searchText);
+            const hasMain = member.top1_flowers.some(f => f.name.toLowerCase().includes(searchText));
+            const hasSub = (currentDay >= 4) && member.top2_flowers.some(f => f.name.toLowerCase().includes(searchText));
 
-            let showMain = hasMain;
-            let showSub = (currentDay >= 4) && hasSub;
+            if (searchText && !hasName && !hasMain && !hasSub) return;
 
-            const cleanMemberName = (member.name || '').replace(/\s+/g, '').toLowerCase();
-
-            if (query !== '') {
-                const nameMatches = cleanMemberName.includes(query);
-                const mainMatches = hasMain && member.top1_flowers.some(f => f.name.replace(/\s+/g, '').toLowerCase().includes(query));
-                const subMatches = showSub && member.top2_flowers.some(f => f.name.replace(/\s+/g, '').toLowerCase().includes(query));
-
-                if (!nameMatches && !mainMatches && !subMatches) {
-                    return;
-                }
-
-                if (!nameMatches) {
-                    showMain = hasMain && member.top1_flowers.some(f => f.name.replace(/\s+/g, '').toLowerCase().includes(query));
-                    showSub = showSub && member.top2_flowers.some(f => f.name.replace(/\s+/g, '').toLowerCase().includes(query));
-                }
-            }
-
-            if (!showMain && !showSub) return;
+            const card = document.createElement('div');
+            card.className = 'member-card';
 
             let tagsHtml = '';
 
-            if (showMain) {
-                member.top1_flowers.forEach(f => {
-                    const cleanFlowerName = f.name.replace(/\s+/g, '').toLowerCase();
-                    if (query === '' || cleanMemberName.includes(query) || cleanFlowerName.includes(query)) {
-                        tagsHtml += `<span class="tag tag-main">★ ${f.name} <span class="score-badge">${f.score}점</span></span>`;
-                    }
-                });
-            }
+            member.top1_flowers.forEach(f => {
+                tagsHtml += `<span class="tag tag-main">★ ${f.name} <span class="score-badge">${f.score}점</span></span>`;
+            });
 
-            if (showSub) {
+            if (currentDay >= 4) {
                 member.top2_flowers.forEach(f => {
-                    const cleanFlowerName = f.name.replace(/\s+/g, '').toLowerCase();
-                    if (query === '' || cleanMemberName.includes(query) || cleanFlowerName.includes(query)) {
-                        tagsHtml += `<span class="tag tag-sub">보조: ${f.name} <span class="score-badge">${f.score}점</span></span>`;
-                    }
+                    tagsHtml += `<span class="tag tag-sub">보조: ${f.name} <span class="score-badge">${f.score}점</span></span>`;
                 });
             }
 
-            if (tagsHtml !== '') {
-                memberCardsHtml.push(`
-                    <div class="member-card">
-                        <div class="member-name"><span class="member-icon">🌸</span> ${member.name}</div>
-                        <div class="flower-tags">${tagsHtml}</div>
-                    </div>
-                `);
-            }
-        });
+            card.innerHTML = `
+                <div class="member-name"><span class="member-icon">🌸</span> ${member.name}</div>
+                <div class="flower-tags">${tagsHtml}</div>
+            `;
 
-        if (memberCardsHtml.length > 0) {
-            listContainer.innerHTML = memberCardsHtml.join('');
-        } else {
-            listContainer.innerHTML = '<div class="loading">검색 결과가 없습니다. 🌸</div>';
-        }
+            listContainer.appendChild(card);
+        });
+    }
+
+    function filterMembers() {
+        renderMembers();
     }
 </script>
 
