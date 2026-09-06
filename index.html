@@ -416,6 +416,7 @@
 
             let tagsHtml = '';
 
+            // 개수 제한(slice) 없이 높은 점수의 모든 꽃 출력
             if (showMain) {
                 member.top1_flowers.forEach(f => {
                     const cleanFlowerName = f.name.replace(/\s+/g, '').toLowerCase();
