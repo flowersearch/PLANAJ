@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>애진화방 경기 전략 가이드</title>
+
+    <!-- 1. 카카오 SDK 로드 -->
+    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+
     <style>
         :root {
             --primary-color: #ff6b81;
@@ -180,6 +184,13 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s ease;
+        }
+
+        .tag:active {
+            transform: scale(0.95);
         }
 
         .tag-main {
@@ -188,10 +199,18 @@
             border: 1.5px solid #91d5ff;
         }
 
+        .tag-main:hover {
+            background-color: #bae7ff;
+        }
+
         .tag-sub {
             background-color: #f9f0ff;
             color: #722ed1;
             border: 1.5px solid #d3ade6;
+        }
+
+        .tag-sub:hover {
+            background-color: #efdbff;
         }
 
         .score-badge {
@@ -245,6 +264,12 @@
 </div>
 
 <script>
+    const KAKAO_JAVASCRIPT_KEY = "115a57bc771889282955a53f6cb47484"; 
+    
+    if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
+        Kakao.init(KAKAO_JAVASCRIPT_KEY);
+    }
+
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyR5BOqYecqHa3WvIF5CHxACUBQosSVqWDyBNThghzcfaWrZXV5RUnXTgCBaSjm5ozxvw/exec";
 
     let globalData = [];
@@ -324,6 +349,38 @@
         renderMembers();
     }
 
+    // 닉네임에서 특수문자, 괄호, 칭호 등을 제외하고 순수 이름만 추출하는 함수
+    function cleanNickName(rawName) {
+        if (!rawName) return '';
+        // 괄호 내용 제거 -> 알파벳, 한글, 숫자만 추출
+        let cleaned = rawName.replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '');
+        let match = cleaned.match(/[가-힣a-zA-Z0-9]+/);
+        return match ? match[0] : rawName.trim();
+    }
+
+    function shareToKakao(flowerName, memberName) {
+        // 순수 닉네임만 정제 후 @태그 구성
+        const pureName = cleanNickName(memberName);
+        const messageText = `${flowerName}🧡 @${pureName}`;
+
+        if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
+            Kakao.Share.sendDefault({
+                objectType: 'text',
+                text: messageText,
+                link: {
+                    mobileWebUrl: window.location.href,
+                    webUrl: window.location.href,
+                },
+            });
+        } else {
+            navigator.clipboard.writeText(messageText).then(() => {
+                alert(`"${messageText}" 문구가 복사되었습니다!\n오픈카톡방에 붙여넣기 해주세요.`);
+            }).catch(() => {
+                alert(`전송 문구: ${messageText}`);
+            });
+        }
+    }
+
     function renderMembers() {
         const query = document.getElementById('searchInput').value.replace(/\s+/g, '').toLowerCase();
         const listContainer = document.getElementById('memberList');
@@ -364,11 +421,15 @@
 
             let tagsHtml = '';
 
+            // 작은따옴표(') 따옴표로 인한 JS 오류 방지 처리
+            const safeMemberName = (member.name || '').replace(/'/g, "\\'");
+
             if (showMain) {
                 member.top1_flowers.forEach(f => {
                     const cleanFlowerName = f.name.replace(/\s+/g, '').toLowerCase();
+                    const safeFlowerName = f.name.replace(/'/g, "\\'");
                     if (query === '' || cleanMemberName.includes(query) || cleanFlowerName.includes(query)) {
-                        tagsHtml += `<span class="tag tag-main">★ ${f.name} <span class="score-badge">${f.score}점</span></span>`;
+                        tagsHtml += `<span class="tag tag-main" onclick="shareToKakao('${safeFlowerName}', '${safeMemberName}')">★ ${f.name} <span class="score-badge">${f.score}점</span></span>`;
                     }
                 });
             }
@@ -376,8 +437,9 @@
             if (showSub) {
                 member.top2_flowers.forEach(f => {
                     const cleanFlowerName = f.name.replace(/\s+/g, '').toLowerCase();
+                    const safeFlowerName = f.name.replace(/'/g, "\\'");
                     if (query === '' || cleanMemberName.includes(query) || cleanFlowerName.includes(query)) {
-                        tagsHtml += `<span class="tag tag-sub">보조: ${f.name} <span class="score-badge">${f.score}점</span></span>`;
+                        tagsHtml += `<span class="tag tag-sub" onclick="shareToKakao('${safeFlowerName}', '${safeMemberName}')">보조: ${f.name} <span class="score-badge">${f.score}점</span></span>`;
                     }
                 });
             }
