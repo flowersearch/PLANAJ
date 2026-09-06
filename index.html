@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>애진화방 경기 전략 가이드</title>
 
-    <!-- 1. 카카오 SDK 로드 -->
-    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
-
     <style>
         :root {
             --primary-color: #ff6b81;
@@ -264,13 +261,7 @@
 </div>
 
 <script>
-    const KAKAO_JAVASCRIPT_KEY = "115a57bc771889282955a53f6cb47484"; 
     const OPEN_CHAT_URL = "https://open.kakao.com/o/g5PJd9Ai";
-
-    if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
-        Kakao.init(KAKAO_JAVASCRIPT_KEY);
-    }
-
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyR5BOqYecqHa3WvIF5CHxACUBQosSVqWDyBNThghzcfaWrZXV5RUnXTgCBaSjm5ozxvw/exec";
 
     let globalData = [];
@@ -350,6 +341,7 @@
         renderMembers();
     }
 
+    // 닉네임에서 특수문자, 괄호, 칭호 등을 제외하고 순수 이름만 추출하는 함수
     function cleanNickName(rawName) {
         if (!rawName) return '';
         let cleaned = rawName.replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '');
@@ -357,35 +349,38 @@
         return match ? match[0] : rawName.trim();
     }
 
+    // [방법 1] 문구 자동 복사 후 오픈채팅방 이동 함수
     function shareToKakao(flowerName, memberName) {
         const pureName = cleanNickName(memberName);
         const messageText = `${flowerName}🧡 @${pureName}`;
 
-        if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
-            Kakao.Share.sendDefault({
-                objectType: 'text',
-                text: messageText,
-                link: {
-                    mobileWebUrl: OPEN_CHAT_URL,
-                    webUrl: OPEN_CHAT_URL,
-                },
-                buttons: [
-                    {
-                        title: '오픈채팅방 바로가기 🌸',
-                        link: {
-                            mobileWebUrl: OPEN_CHAT_URL,
-                            webUrl: OPEN_CHAT_URL,
-                        },
-                    },
-                ],
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(messageText).then(() => {
+                alert(`"${messageText}" 문구가 복사되었습니다!\n오픈카톡방에 붙여넣기 해주세요. 🌸`);
+                window.location.href = OPEN_CHAT_URL;
+            }).catch(() => {
+                fallbackCopyText(messageText);
             });
         } else {
-            navigator.clipboard.writeText(messageText).then(() => {
-                alert(`"${messageText}" 문구가 복사되었습니다!\n오픈카톡방에 붙여넣기 해주세요.`);
-            }).catch(() => {
-                alert(`전송 문구: ${messageText}`);
-            });
+            fallbackCopyText(messageText);
         }
+    }
+
+    // 호환성용 백업 복사 함수
+    function fallbackCopyText(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            alert(`"${text}" 문구가 복사되었습니다!\n오픈카톡방에 붙여넣기 해주세요. 🌸`);
+            window.location.href = OPEN_CHAT_URL;
+        } catch (err) {
+            prompt("아래 문구를 복사해 주세요:", text);
+            window.location.href = OPEN_CHAT_URL;
+        }
+        document.body.removeChild(textArea);
     }
 
     function renderMembers() {
