@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚢 애진화방 상회경기 </title>
+    <title>🚢 애진화방 상회경기 🚢</title>
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -309,7 +309,7 @@
 
 <div class="container">
     <header>
-        <h1>🚢 애진화방 상회경기 </h1>
+        <h1>🚢 애진화방 상회경기 🚢</h1>
     </header>
 
     <!-- Search Section (Filter Input) -->
@@ -359,27 +359,27 @@
     const SOLUTIONS = {
         1: {
             title: "🌱 1일차 전략",
-            text: "1일차는 아직 시간이 여유로운 편이라 지정된 꽃만 진행해주시면 됩니다.",
+            text: "1일차는 아직 시간이 여유로운 편이라 지정된 높은 꽃 위주로 천천히 진행해주시면 됩니다.\n굳이 서두르실 필요 없이 높은 꽃이 나왔을 때 진행해주시고, 다른 꽃은 크게 신경 쓰지 않으셔도 괜찮습니다.",
             key: "→ 1일차는 지정된 높은 꽃만 여유롭게 진행!"
         },
         2: {
             title: "🌱 2일차 전략",
-            text: "2일차 역시 시간적인 여유가 있기 때문에 지정된 꽃만 우선적으로 진행해주세요.\n여유를 갖고 조금 더 기다려봐요~",
+            text: "2일차 역시 시간적인 여유가 있기 때문에 지정된 높은 꽃을 우선적으로 진행해주세요.\n조금 기다리더라도 높은 꽃을 잡아가는 방향으로 진행하면 되고, 보조꽃까지 무리해서 챙길 필요는 없습니다.",
             key: "→ 2일차도 높은 꽃 위주로 천천히 진행!"
         },
         3: {
             title: "🌱 3일차 전략",
-            text: "3일차까지는 크게 급하게 진행하지 않아도 됩니다.\n지정된 높은 꽃이 나올 때까지 기다렸다가 진행해주시고, 아직은 보조꽃보다는 지정된 꽃에 집중!!!",
+            text: "3일차까지는 크게 급하게 진행하지 않아도 됩니다.\n지정된 높은 꽃이 나올 때까지 기다렸다가 진행해주시고, 아직은 보조꽃보다는 높은 꽃에 집중해주시면 됩니다.",
             key: "→ 3일차까지는 높은 꽃 위주로 여유롭게!"
         },
         4: {
             title: "🌼 4일차 전략",
-            text: "4일차부터는 조금씩 속도를 올려볼까요???\n높은 꽃을 기본으로 진행하되, 높은 꽃을 기다리는 시간이 길어지면 보조꽃도 함께 진행해주세요.\n높은 꽃만 계속 기다리기보다는 상황에 따라 보조꽃을 섞어주시면 훨씬 안정적으로 진행할 수 있습니다.",
+            text: "4일차부터는 조금씩 속도를 올려주시면 좋습니다.\n높은 꽃을 기본으로 진행하되, 높은 꽃을 기다리는 시간이 길어지면 보조꽃도 함께 진행해주세요.\n높은 꽃만 계속 기다리기보다는 상황에 따라 보조꽃을 섞어주시면 훨씬 안정적으로 진행할 수 있습니다.",
             key: "→ 4일차부터는 높은 꽃 + 보조꽃 병행 가능!"
         },
         5: {
             title: "🌼 5일차 전략",
-            text: "5일차는 마무리 단계인 만큼 조금 더 적극적으로 진행해주세요.\n높은 꽃이 가장 우선이지만, 너무 오래 기다리기보다는 추천드린 보조꽃도 같이 진행해주세요.\n특히 남은 시간이 부족해질 경우에는 보조꽃을 적극적으로 활용해서 최대한 안정적으로 마무리하는 방향으로 진행하면 됩니다.",
+            text: "5일차는 마무리 단계인 만큼 조금 더 적극적으로 진행해주시면 됩니다.\n높은 꽃이 가장 우선이지만, 너무 오래 기다리기보다는 추천드린 보조꽃도 같이 진행해주세요.\n특히 남은 시간이 부족해질 경우에는 보조꽃을 적극적으로 활용해서 최대한 안정적으로 마무리하는 방향으로 진행하면 됩니다.",
             key: "→ 5일차는 높은 꽃 우선 + 보조꽃 적극 활용!"
         }
     };
@@ -425,9 +425,10 @@
         renderData();
     }
 
-    // Calculation Logic for Each Nickname
+    // Calculation Logic for Each Nickname (Includes 14-point flowers if high-score flowers are missing)
     function getNicknameFlowerStrategy(nick) {
-        const owned = flowerData.filter(d => d.owners[nick] && d.score > 14);
+        // 28, 25, 23, 21점이 없는 사람도 14점 꽃을 지정할 수 있도록 >= 14 로 변경
+        const owned = flowerData.filter(d => d.owners[nick] && d.score >= 14);
         if (owned.length === 0) return { days13: [], days45: [] };
 
         const scoreGroups = {};
