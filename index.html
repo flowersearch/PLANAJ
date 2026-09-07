@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚢 애진화방 상회경기 </title>
+
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
             --bg-main: #fdfbfb;
@@ -39,27 +41,6 @@
         .container {
             max-width: 1000px;
             margin: 0 auto;
-        }
-
-        /* Header UI - 소프트 로즈 핑크 테마 */
-        header {
-            text-align: center;
-            padding: 24px 20px;
-            background-color: #fff0f3;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 24px;
-            border: 2px solid #ffccd5;
-        }
-
-        header h1 {
-            font-size: 1.9rem;
-            font-weight: 800;
-            color: #e63946;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
 
         /* Search Section */
@@ -305,12 +286,12 @@
         }
     </style>
 </head>
+
 <body>
 
 <div class="container">
-    <header>
-        <h1>🚢 애진화방 상회경기 </h1>
-    </header>
+
+    <!-- 기존 제목 박스 삭제됨 -->
 
     <!-- Search Section (Filter Input) -->
     <div class="search-box">
@@ -343,6 +324,7 @@
             <p>데이터를 불러오는 중입니다...</p>
         </div>
     </div>
+
 </div>
 
 <!-- Toast Notification -->
@@ -425,9 +407,8 @@
         renderData();
     }
 
-    // Calculation Logic for Each Nickname (Includes 14-point flowers if high-score flowers are missing)
+    // Calculation Logic for Each Nickname
     function getNicknameFlowerStrategy(nick) {
-        // 28, 25, 23, 21점이 없는 사람도 14점 꽃을 지정할 수 있도록 >= 14 로 변경
         const owned = flowerData.filter(d => d.owners[nick] && d.score >= 14);
         if (owned.length === 0) return { days13: [], days45: [] };
 
@@ -446,45 +427,50 @@
             const topScore = sortedScores[0];
             const topFlowers = scoreGroups[topScore];
 
-            // 1~3일차 로직: 가장 높은 꽃이 23점짜리 1~2개인 경우 -> 21점 꽃도 함께 지정
             if (topScore === 23 && (topFlowers.length === 1 || topFlowers.length === 2) && scoreGroups[21]) {
                 days13 = [...topFlowers, ...scoreGroups[21]];
             } else {
                 days13 = topFlowers;
             }
 
-            // 4~5일차 로직: 다음 순위 점수 그룹을 보조꽃으로 지정
             days45 = sortedScores.length > 1 ? scoreGroups[sortedScores[1]] : [];
         }
 
         return { days13, days45 };
     }
 
-    // Render Data (Strict Nickname Match vs 2-Char Min Flower Keyword Search)
+    // Render Data
     function renderData() {
         const day = parseInt(activeTab);
         const sol = SOLUTIONS[day];
 
-        // 1. 공통 솔루션 상단 배치
         const commonSolDiv = document.getElementById('common-solution');
+
         commonSolDiv.innerHTML = `
-            <div class="common-solution-title"><i class="fa-solid fa-lightbulb" style="color:#ff80ab;"></i> ${sol.title}</div>
-            <div class="common-solution-body">${sol.text.replace(/\n/g, '<br>')}</div>
-            <div class="common-solution-key">${sol.key}</div>
+            <div class="common-solution-title">
+                <i class="fa-solid fa-lightbulb" style="color:#ff80ab;"></i>
+                ${sol.title}
+            </div>
+            <div class="common-solution-body">
+                ${sol.text.replace(/\n/g, '<br>')}
+            </div>
+            <div class="common-solution-key">
+                ${sol.key}
+            </div>
         `;
 
-        // 2. 닉네임별 꽃 현황 렌더링
         const rawQuery = document.getElementById('search-input').value.trim();
         const cleanQuery = rawQuery.replace(/\s+/g, '').toLowerCase();
-        
+
         const resultsDiv = document.getElementById('results');
         resultsDiv.innerHTML = '';
 
         const isHighDay = day <= 3;
         let renderedCount = 0;
 
-        // 전체 닉네임 중 현재 검색어와 100% 완전 일치하는 닉네임이 있는지 먼저 파악
-        const isExactNickSearch = nicknames.some(nick => nick.replace(/\s+/g, '').toLowerCase() === cleanQuery);
+        const isExactNickSearch = nicknames.some(
+            nick => nick.replace(/\s+/g, '').toLowerCase() === cleanQuery
+        );
 
         nicknames.forEach(nick => {
             const { days13, days45 } = getNicknameFlowerStrategy(nick);
@@ -496,19 +482,18 @@
             if (!cleanQuery) {
                 isMatch = true;
             } else if (isExactNickSearch) {
-                // [닉네임 검색 모드] 입력어가 닉네임과 100% 일치하면 해당 닉네임 카드만 정확히 표시
                 const cleanNick = nick.replace(/\s+/g, '').toLowerCase();
                 isMatch = (cleanNick === cleanQuery);
             } else {
-                // [꽃 이름 검색 모드] 닉네임과 일치하지 않는 검색어일 때 -> 꽃 검색은 '2자 이상'이어야 작동
                 if (cleanQuery.length >= 2) {
                     const allDisplayFlowers = [...targetFlowers, ...subFlowers];
+
                     isMatch = allDisplayFlowers.some(f => {
                         const cleanFlowerName = f.name.replace(/\s+/g, '').toLowerCase();
                         return cleanFlowerName.includes(cleanQuery);
                     });
                 } else {
-                    isMatch = false; // 1자 검색어는 닉네임 미일치 시 꽃 검색 불가
+                    isMatch = false;
                 }
             }
 
@@ -522,34 +507,62 @@
             card.className = `day-card ${day >= 4 ? 'highlight' : ''}`;
 
             let flowerHtml = '';
+
             if (isHighDay) {
                 flowerHtml = `
-                    <div class="flower-list-title"><i class="fa-solid fa-crown" style="color:#ffb7b2;"></i> 지정꽃:</div>
+                    <div class="flower-list-title">
+                        <i class="fa-solid fa-crown" style="color:#ffb7b2;"></i>
+                        지정꽃:
+                    </div>
+
                     <div class="flower-chips">
-                        ${targetFlowers.length > 0 ? targetFlowers.map(f => `
-                            <button class="flower-chip" onclick="copyFlowerName('${f.name}')">
-                                🌸 ${f.name} <span class="score-tag">${f.score}점</span>
-                            </button>
-                        `).join('') : '<span style="color:var(--text-muted); font-size:0.85rem;">지정된 꽃이 없습니다.</span>'}
-                    </div>`;
+                        ${targetFlowers.length > 0
+                            ? targetFlowers.map(f => `
+                                <button class="flower-chip" onclick="copyFlowerName('${f.name}')">
+                                    🌸 ${f.name}
+                                    <span class="score-tag">${f.score}점</span>
+                                </button>
+                            `).join('')
+                            : '<span style="color:var(--text-muted); font-size:0.85rem;">지정된 꽃이 없습니다.</span>'
+                        }
+                    </div>
+                `;
             } else {
                 flowerHtml = `
-                    <div class="flower-list-title"><i class="fa-solid fa-star" style="color:#ffb7b2;"></i> 우선 보유 꽃 (최고 점수):</div>
-                    <div class="flower-chips" style="margin-bottom:10px;">
-                        ${subFlowers.length > 0 ? subFlowers.map(f => `
-                            <button class="flower-chip" onclick="copyFlowerName('${f.name}')">
-                                👑 ${f.name} <span class="score-tag">${f.score}점</span>
-                            </button>
-                        `).join('') : '<span style="color:var(--text-muted); font-size:0.85rem;">없음</span>'}
+                    <div class="flower-list-title">
+                        <i class="fa-solid fa-star" style="color:#ffb7b2;"></i>
+                        우선 보유 꽃 (최고 점수):
                     </div>
-                    <div class="flower-list-title"><i class="fa-solid fa-seedling" style="color:#7cb342;"></i> 추천 보조 꽃 (2순위 점수):</div>
+
+                    <div class="flower-chips" style="margin-bottom:10px;">
+                        ${subFlowers.length > 0
+                            ? subFlowers.map(f => `
+                                <button class="flower-chip" onclick="copyFlowerName('${f.name}')">
+                                    👑 ${f.name}
+                                    <span class="score-tag">${f.score}점</span>
+                                </button>
+                            `).join('')
+                            : '<span style="color:var(--text-muted); font-size:0.85rem;">없음</span>'
+                        }
+                    </div>
+
+                    <div class="flower-list-title">
+                        <i class="fa-solid fa-seedling" style="color:#7cb342;"></i>
+                        추천 보조 꽃 (2순위 점수):
+                    </div>
+
                     <div class="flower-chips">
-                        ${targetFlowers.length > 0 ? targetFlowers.map(f => `
-                            <button class="flower-chip" onclick="copyFlowerName('${f.name}')">
-                                🌼 ${f.name} <span class="score-tag">${f.score}점</span>
-                            </button>
-                        `).join('') : '<span style="color:var(--text-muted); font-size:0.85rem;">추천 보조 꽃이 없습니다.</span>'}
-                    </div>`;
+                        ${targetFlowers.length > 0
+                            ? targetFlowers.map(f => `
+                                <button class="flower-chip" onclick="copyFlowerName('${f.name}')">
+                                    🌼 ${f.name}
+                                    <span class="score-tag">${f.score}점</span>
+                                </button>
+                            `).join('')
+                            : '<span style="color:var(--text-muted); font-size:0.85rem;">추천 보조 꽃이 없습니다.</span>'
+                        }
+                    </div>
+                `;
             }
 
             card.innerHTML = `
@@ -558,6 +571,7 @@
                 </div>
                 ${flowerHtml}
             `;
+
             resultsDiv.appendChild(card);
         });
 
@@ -566,21 +580,28 @@
                 <div class="empty-state">
                     <i class="fa-solid fa-circle-exclamation"></i>
                     <p>'${rawQuery}'에 해당하는 결과가 없습니다.</p>
-                </div>`;
+                </div>
+            `;
         }
     }
 
     // Filter Tab Click
     function selectTab(tab, btn) {
         activeTab = tab;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+        document.querySelectorAll('.tab-btn').forEach(
+            b => b.classList.remove('active')
+        );
+
         btn.classList.add('active');
+
         renderData();
     }
 
     // Copy Flower Name + Heart Emoji
     function copyFlowerName(flowerName) {
         const copyText = `${flowerName} ❤️`;
+
         navigator.clipboard.writeText(copyText).then(() => {
             showToast(`'${copyText}' 복사되었습니다!`);
         }).catch(err => {
@@ -591,8 +612,11 @@
     // Toast Notification Display
     function showToast(msg) {
         const toast = document.getElementById('toast');
+
         document.getElementById('toast-msg').innerText = msg;
+
         toast.classList.add('show');
+
         setTimeout(() => {
             toast.classList.remove('show');
         }, 2200);
