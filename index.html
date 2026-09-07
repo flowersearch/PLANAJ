@@ -3,225 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>애진화방 경기 전략 가이드</title>
+    <title>🚢 애진화방 상회경기 🚢</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #ff6b81;
-            --bg-color: #fdf6f8;
+            --bg-main: #fdfbfb;
+            --primary-pastel: #ffb7b2;
+            --secondary-pastel: #e2f0cb;
+            --accent-pink: #ff9aa2;
+            --soft-purple: #e1ce7a;
+            --pastel-blue: #c7ceea;
+            --text-dark: #4a4a4a;
+            --text-muted: #888888;
             --card-bg: #ffffff;
-            --text-color: #2c3e50;
+            --border-radius: 20px;
+            --shadow: 0 10px 25px rgba(255, 183, 178, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', sans-serif;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 16px;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            color: var(--text-dark);
+            padding: 20px;
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
+        /* Header UI - 소프트 로즈 핑크 테마 */
         header {
             text-align: center;
-            margin-bottom: 20px;
+            padding: 24px 20px;
+            background-color: #fff0f3;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            border: 2px solid #ffccd5;
         }
 
-        h1 {
-            color: #d81b60;
-            margin: 0 0 6px 0;
-            font-size: 1.8em;
+        header h1 {
+            font-size: 1.9rem;
             font-weight: 800;
-        }
-
-        .controls {
-            background: var(--card-bg);
-            padding: 18px;
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(255, 182, 193, 0.2);
-            margin-bottom: 16px;
+            color: #e63946;
             display: flex;
-            flex-direction: column;
-            gap: 12px;
-            border: 1px solid #ffe3ed;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 13px 16px;
-            font-size: 15px;
-            border: 2px solid #ffd1dc;
-            border-radius: 10px;
-            box-sizing: border-box;
-            outline: none;
-            transition: all 0.2s ease;
-        }
-
-        .search-box input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(255, 107, 129, 0.15);
-        }
-
-        .day-buttons {
-            display: flex;
+            align-items: center;
+            justify-content: center;
             gap: 8px;
         }
 
-        .day-btn {
-            flex: 1;
-            padding: 12px 0;
-            border: none;
-            background-color: #fce4ec;
-            color: #880e4f;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 0.95em;
-            transition: all 0.2s ease;
+        /* Search Section */
+        .search-box {
+            background: var(--card-bg);
+            padding: 18px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
         }
 
-        .day-btn.active {
-            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
-            color: white;
-            box-shadow: 0 3px 8px rgba(255, 117, 140, 0.4);
-            transform: translateY(-1px);
-        }
-
-        .solution-box {
-            background: #fffde7;
-            border: 2px solid #fff59d;
-            border-left: 6px solid #fbc02d;
-            padding: 16px 18px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            line-height: 1.6;
-            font-size: 0.95em;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.02);
-        }
-
-        .solution-box.urgent {
-            background: #fff0f3;
-            border: 2px solid #ffccd5;
-            border-left: 6px solid #ff4d6d;
-        }
-
-        .solution-title {
-            font-weight: 800;
-            font-size: 1.15em;
-            margin-bottom: 8px;
-            color: #f57f17;
-        }
-
-        .solution-box.urgent .solution-title {
-            color: #c9184a;
-        }
-
-        .solution-summary {
-            margin-top: 10px;
-            font-weight: bold;
-            color: #d81b60;
-            background: #ffffff;
-            padding: 8px 12px;
-            border-radius: 8px;
-            display: inline-block;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-            border: 1px solid #f8bbd0;
-        }
-
-        .member-list {
+        .search-row {
             display: flex;
-            flex-direction: column;
             gap: 12px;
         }
 
-        .member-card {
-            background: var(--card-bg);
+        .search-input-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-pink);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 14px 12px 44px;
+            border: 2px solid #ffdac1;
             border-radius: 14px;
-            padding: 16px 18px;
-            box-shadow: 0 4px 12px rgba(230, 200, 210, 0.2);
-            border: 1.5px solid #ffe4e9;
-            transition: transform 0.2s ease;
+            font-size: 1rem;
+            outline: none;
+            background-color: #fff9f9;
+            transition: all 0.2s;
         }
 
-        .member-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(230, 180, 200, 0.3);
+        .search-input:focus {
+            border-color: var(--accent-pink);
+            background-color: #ffffff;
         }
 
-        .member-name {
-            font-size: 1.15em;
+        /* Day Navigation Tabs */
+        .day-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 90px;
+            padding: 12px 8px;
+            background-color: var(--card-bg);
+            border: 2px solid #f2e3e3;
+            border-radius: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--primary-pastel);
+            color: var(--accent-pink);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ffb7b2 0%, #ff9aa2 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(255, 154, 162, 0.3);
+        }
+
+        /* Solution Display Box */
+        .common-solution-card {
+            background: linear-gradient(135deg, #fff5f5 0%, #f0f4ff 100%);
+            border: 2px solid #ffe3e3;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .common-solution-title {
+            font-size: 1.15rem;
             font-weight: 800;
-            color: #333333;
+            color: #e57373;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .common-solution-body {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        .common-solution-key {
+            margin-top: 10px;
+            font-weight: 700;
+            color: #d81b60;
+            font-size: 0.95rem;
+        }
+
+        /* Results Display */
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .day-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 18px 22px;
+            border-left: 6px solid var(--primary-pastel);
+        }
+
+        .day-card.highlight {
+            border-left-color: var(--pastel-blue);
+        }
+
+        .day-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #f2e3e3;
+        }
+
+        .nickname-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .flower-list-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .member-icon {
-            font-size: 0.9em;
-        }
-
-        .flower-tags {
+        .flower-chips {
             display: flex;
-            gap: 8px;
             flex-wrap: wrap;
-            align-items: center;
+            gap: 8px;
         }
 
-        .tag {
-            padding: 7px 12px;
+        .flower-chip {
+            background: linear-gradient(135deg, #ffffff 0%, #fff0f5 100%);
+            border: 1.5px solid #ffb7b2;
+            color: #d81b60;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 0.88em;
+            font-size: 0.9rem;
             font-weight: 700;
+            cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.15s ease;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(255, 183, 178, 0.2);
+            transition: all 0.2s;
         }
 
-        .tag:active {
-            transform: scale(0.95);
+        .flower-chip:hover {
+            transform: scale(1.05);
+            background: #ffb7b2;
+            color: white;
         }
 
-        .tag-main {
-            background-color: #e6f7ff;
-            color: #0066cc;
-            border: 1.5px solid #91d5ff;
-        }
-
-        .tag-main:hover {
-            background-color: #bae7ff;
-        }
-
-        .tag-sub {
-            background-color: #f9f0ff;
-            color: #722ed1;
-            border: 1.5px solid #d3ade6;
-        }
-
-        .tag-sub:hover {
-            background-color: #efdbff;
-        }
-
-        .score-badge {
-            background: rgba(255, 255, 255, 0.85);
+        .flower-chip .score-tag {
+            font-size: 0.75rem;
+            background-color: rgba(216, 27, 96, 0.1);
             padding: 2px 6px;
             border-radius: 10px;
-            font-size: 0.85em;
-            margin-left: 2px;
         }
 
-        .loading {
+        .flower-chip:hover .score-tag {
+            background-color: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .empty-state {
             text-align: center;
-            padding: 40px;
-            color: #a0aec0;
-            font-weight: 600;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            color: var(--primary-pastel);
+            margin-bottom: 12px;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, #ff9aa2 0%, #ffb7b2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 700;
+            box-shadow: 0 6px 20px rgba(255, 154, 162, 0.4);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 12px; }
+            .day-tabs { flex-wrap: nowrap; }
+            .tab-btn { min-width: 75px; padding: 10px 4px; font-size: 0.85rem; }
         }
     </style>
 </head>
@@ -229,232 +309,292 @@
 
 <div class="container">
     <header>
-        <h1>🌸 경기 전략 가이드 🌸</h1>
+        <h1>🚢 애진화방 상회경기 🚢</h1>
     </header>
 
-    <div class="controls">
-        <div class="search-box">
-            <input type="text" id="searchInput" oninput="filterMembers()" placeholder="🔍 일원 닉네임 또는 꽃 이름 검색...">
-        </div>
-
-        <div class="day-buttons">
-            <button class="day-btn active" onclick="setDay(1)">1일차</button>
-            <button class="day-btn" onclick="setDay(2)">2일차</button>
-            <button class="day-btn" onclick="setDay(3)">3일차</button>
-            <button class="day-btn" onclick="setDay(4)">4일차</button>
-            <button class="day-btn" onclick="setDay(5)">5일차</button>
+    <!-- Search Section (Filter Input) -->
+    <div class="search-box">
+        <div class="search-row">
+            <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="search-input" class="search-input" placeholder="닉네임 또는 꽃 이름으로 필터링 (예: 이매, 디필레아)" onkeyup="renderData()">
+            </div>
         </div>
     </div>
 
-    <div id="solutionBox" class="solution-box">
-        <div id="solutionTitle" class="solution-title">🌱 1일차 전략 가이드</div>
-        <div id="solutionText">
-            1일차는 아직 시간이 여유로운 편이라 지정된 높은 꽃 위주로 천천히 진행해주시면 됩니다. 굳이 서두르실 필요 없이 높은 꽃이 나왔을 때 진행해주시고, 다른 꽃은 크게 신경 쓰지 않으셔도 괜찮습니다.
-        </div>
-        <div id="solutionSummary" class="solution-summary">→ 1일차는 지정된 높은 꽃만 여유롭게 진행!</div>
+    <!-- Day Filter Tabs -->
+    <div class="day-tabs">
+        <button class="tab-btn active" onclick="selectTab('1', this)">🌱 1일차</button>
+        <button class="tab-btn" onclick="selectTab('2', this)">🌱 2일차</button>
+        <button class="tab-btn" onclick="selectTab('3', this)">🌱 3일차</button>
+        <button class="tab-btn" onclick="selectTab('4', this)">🌼 4일차</button>
+        <button class="tab-btn" onclick="selectTab('5', this)">🌼 5일차</button>
     </div>
 
-    <div class="member-list" id="memberList">
-        <div class="loading">시트 데이터를 불러오는 중입니다... 🌸</div>
+    <!-- Common Solution Display Box -->
+    <div id="common-solution" class="common-solution-card">
+        <!-- JS로 동적 삽입 -->
+    </div>
+
+    <!-- Main Results Display -->
+    <div id="results" class="results-container">
+        <div class="empty-state">
+            <i class="fa-solid fa-seedling"></i>
+            <p>데이터를 불러오는 중입니다...</p>
+        </div>
     </div>
 </div>
 
+<!-- Toast Notification -->
+<div id="toast" class="toast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toast-msg">복사되었습니다!</span>
+</div>
+
 <script>
-    // 본인의 배포된 구글 앱스 스크립트 웹앱 URL 입력
-    const GAS_WEB_APP_URL = "여기에_새로운_웹앱_URL을_넣어주세요";
+    // Google Apps Script Web App Endpoint URL
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbx0z61tZ4eWhTT5LPlJfnT1c1UqtTb9B4TACYm1tKdDG01fvZvIAAfhIBNJpsE_E8Vvkg/exec";
 
-    let globalData = [];
-    let currentDay = 1;
-
-    window.onload = function() {
-        fetchData();
-    };
-
-    function fetchData() {
-        fetch(GAS_WEB_APP_URL)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("네트워크 응답 오류");
-                }
-                return response.json();
-            })
-            .then(data => {
-                globalData = data;
-                renderMembers();
-            })
-            .catch(error => {
-                console.error("데이터 로드 오류:", error);
-                document.getElementById('memberList').innerHTML = '<div class="loading">데이터를 불러오지 못했습니다. Google Apps Script 배포 상태를 확인해 주세요. 🌸</div>';
-            });
-    }
-
-    const daySolutions = {
+    // Day Solutions Data
+    const SOLUTIONS = {
         1: {
-            title: "🌱 1일차 전략 가이드",
-            text: "1일차는 아직 시간이 여유로운 편이라 지정된 높은 꽃 위주로 천천히 진행해주시면 됩니다.<br>굳이 서두르실 필요 없이 높은 꽃이 나왔을 때 진행해주시고, 다른 꽃은 크게 신경 쓰지 않으셔도 괜찮습니다.",
-            summary: "→ 1일차는 지정된 높은 꽃만 여유롭게 진행!",
-            urgent: false
+            title: "🌱 1일차 전략",
+            text: "1일차는 아직 시간이 여유로운 편이라 지정된 꽃만 진행해주시면 됩니다.\n지정된 꽃 외에 해버리고 싶어도 참기^^.",
+            key: "→ 1일차는 지정된 높은 꽃만 여유롭게 진행!"
         },
         2: {
-            title: "🌱 2일차 전략 가이드",
-            text: "2일차 역시 시간적인 여유가 있기 때문에 지정된 높은 꽃을 우선적으로 진행해주세요.<br>조금 기다리더라도 높은 꽃을 잡아가는 방향으로 진행하면 되고, 보조꽃까지 무리해서 챙길 필요는 없습니다.",
-            summary: "→ 2일차도 높은 꽃 위주로 천천히 진행!",
-            urgent: false
+            title: "🌱 2일차 전략",
+            text: "2일차 역시 시간적인 여유가 있기 때문에 지정된 꽃만 우선적으로 진행해주세요.\n여유를 갖고 조금 더 기다려봐요~~.",
+            key: "→ 2일차도 높은 꽃 위주로 천천히 진행!"
         },
         3: {
-            title: "🌱 3일차 전략 가이드",
-            text: "3일차까지는 크게 급하게 진행하지 않아도 됩니다.<br>지정된 높은 꽃이 나올 때까지 기다렸다가 진행해주시고, 아직은 보조꽃보다는 높은 꽃에 집중해주시면 됩니다.",
-            summary: "→ 3일차까지는 높은 꽃 위주로 여유롭게!",
-            urgent: false
+            title: "🌱 3일차 전략",
+            text: "3일차까지는 크게 급하게 진행하지 않아도 됩니다.\n지정된 높은 꽃이 나올 때까지 기다렸다가 진행해주시고, 아직은 보조꽃보다는 지정된 꽃에 집중!!!.",
+            key: "→ 3일차까지는 높은 꽃 위주로 여유롭게!"
         },
         4: {
-            title: "🌼 4일차 전략 가이드",
-            text: "4일차부터는 조금씩 속도를 올려주시면 좋습니다.<br>높은 꽃을 기본으로 진행하되, 높은 꽃을 기다리는 시간이 길어지면 보조꽃도 함께 진행해주세요.<br>높은 꽃만 계속 기다리기보다는 상황에 따라 보조꽃을 섞어주시면 훨씬 안정적으로 진행할 수 있습니다.",
-            summary: "→ 4일차부터는 높은 꽃 + 보조꽃 병행 가능!",
-            urgent: true
+            title: "🌼 4일차 전략",
+            text: "4일차부터는 조금씩 속도를 올려볼까요???\n높은 꽃을 기본으로 진행하되, 높은 꽃을 기다리는 시간이 길어지면 보조꽃도 함께 진행해주세요.\n높은 꽃만 계속 기다리기보다는 상황에 따라 보조꽃을 섞어주시면 훨씬 안정적으로 진행할 수 있습니다.",
+            key: "→ 4일차부터는 높은 꽃 + 보조꽃 병행 가능!"
         },
         5: {
-            title: "🌼 5일차 전략 가이드",
-            text: "5일차는 마무리 단계인 만큼 조금 더 적극적으로 진행해주시면 됩니다.<br>높은 꽃이 가장 우선이지만, 너무 오래 기다리기보다는 추천드린 보조꽃도 같이 진행해주세요.<br>특히 남은 시간이 부족해질 경우에는 보조꽃을 적극적으로 활용해서 최대한 안정적으로 마무리하는 방향으로 진행하면 됩니다.",
-            summary: "→ 5일차는 높은 꽃 우선 + 보조꽃 적극 활용!",
-            urgent: true
+            title: "🌼 5일차 전략",
+            text: "5일차는 마무리 단계인 만큼 조금 더 적극적으로 진행해주세요.\n높은 꽃이 가장 우선이지만, 너무 오래 기다리기보다는 추천드린 보조꽃도 같이 진행해주세요.\n특히 남은 시간이 부족해질 경우에는 보조꽃을 적극적으로 활용해서 최대한 안정적으로 마무리하는 방향으로 진행하면 됩니다.",
+            key: "→ 5일차는 높은 꽃 우선 + 보조꽃 적극 활용!"
         }
     };
 
-    function setDay(day) {
-        currentDay = day;
-        document.querySelectorAll('.day-btn').forEach((btn, idx) => {
-            btn.classList.toggle('active', idx + 1 === day);
-        });
+    let flowerData = [];
+    let nicknames = [];
+    let activeTab = '1';
 
-        const config = daySolutions[day];
-        document.getElementById('solutionTitle').innerHTML = config.title;
-        document.getElementById('solutionText').innerHTML = config.text;
-        document.getElementById('solutionSummary').innerHTML = config.summary;
-        document.getElementById('solutionBox').classList.toggle('urgent', config.urgent);
+    window.onload = function() {
+        fetchDataFromGAS();
+    };
 
-        renderMembers();
-    }
-
-    function filterMembers() {
-        renderMembers();
-    }
-
-    function copyFlowerName(flowerName) {
-        const textToCopy = `${flowerName}🧡`;
-
-        copyToClipboard(textToCopy, function() {
-            alert(`"${textToCopy}" 문구가 클립보드에 복사되었습니다! 🌸`);
-        });
-    }
-
-    function copyToClipboard(text, callback) {
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(text).then(callback).catch(() => {
-                fallbackCopy(text, callback);
+    // Fetch JSON from Google Apps Script
+    function fetchDataFromGAS() {
+        fetch(GAS_URL)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    processData(data);
+                } else if (data.error) {
+                    alert("오류: " + data.error);
+                }
+            })
+            .catch(err => {
+                console.error("GAS 데이터 로드 실패:", err);
             });
-        } else {
-            fallbackCopy(text, callback);
-        }
     }
 
-    function fallbackCopy(text, callback) {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.style.position = "fixed";
-        textArea.style.opacity = "0";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-            document.execCommand('copy');
-            callback();
-        } catch (err) {
-            prompt("아래 문구를 직접 복사해 주세요:", text);
-        }
-        document.body.removeChild(textArea);
+    // Process Received JSON Data
+    function processData(data) {
+        flowerData = data.map(item => ({
+            name: (item.flowerName || item.name || '').toString().trim(),
+            score: parseFloat(item.score) || 0,
+            owners: item.owners || {}
+        })).filter(d => d.name !== '');
+
+        const nickSet = new Set();
+        flowerData.forEach(item => {
+            Object.keys(item.owners).forEach(nick => nickSet.add(nick));
+        });
+        nicknames = Array.from(nickSet);
+
+        renderData();
     }
 
-    function renderMembers() {
-        const query = document.getElementById('searchInput').value.replace(/\s+/g, '').toLowerCase();
-        const listContainer = document.getElementById('memberList');
-        listContainer.innerHTML = '';
+    // Calculation Logic for Each Nickname
+    function getNicknameFlowerStrategy(nick) {
+        const owned = flowerData.filter(d => d.owners[nick] && d.score > 14);
+        if (owned.length === 0) return { days13: [], days45: [] };
 
-        if (!globalData || globalData.length === 0) {
-            listContainer.innerHTML = '<div class="loading">데이터가 없거나 불러오는 중입니다. 🌸</div>';
-            return;
-        }
-
-        const memberCardsHtml = [];
-
-        globalData.forEach(member => {
-            const validMainFlowers = member.top1_flowers || [];
-            const validSubFlowers = member.top2_flowers || [];
-
-            const hasMain = validMainFlowers.length > 0;
-            const hasSub = validSubFlowers.length > 0;
-
-            let showMain = hasMain;
-            let showSub = (currentDay >= 4) && hasSub;
-
-            const cleanMemberName = (member.name || '').replace(/\s+/g, '').toLowerCase();
-
-            if (query !== '') {
-                const nameMatches = cleanMemberName.includes(query);
-                const mainMatches = hasMain && validMainFlowers.some(f => f.name.replace(/\s+/g, '').toLowerCase().includes(query));
-                const subMatches = showSub && validSubFlowers.some(f => f.name.replace(/\s+/g, '').toLowerCase().includes(query));
-
-                if (!nameMatches && !mainMatches && !subMatches) {
-                    return;
-                }
-
-                if (!nameMatches) {
-                    showMain = hasMain && validMainFlowers.some(f => f.name.replace(/\s+/g, '').toLowerCase().includes(query));
-                    showSub = showSub && validSubFlowers.some(f => f.name.replace(/\s+/g, '').toLowerCase().includes(query));
-                }
-            }
-
-            if (!showMain && !showSub) return;
-
-            let tagsHtml = '';
-
-            // 최고점 그룹 꽃태그 전체 출력
-            if (showMain) {
-                validMainFlowers.forEach(f => {
-                    const cleanFlowerName = f.name.replace(/\s+/g, '').toLowerCase();
-                    const safeFlowerName = f.name.replace(/'/g, "\\'");
-                    if (query === '' || cleanMemberName.includes(query) || cleanFlowerName.includes(query)) {
-                        tagsHtml += `<span class="tag tag-main" onclick="copyFlowerName('${safeFlowerName}')">★ ${f.name} <span class="score-badge">${f.score}점</span></span>`;
-                    }
-                });
-            }
-
-            // 두번째 높은 점수 그룹(보조꽃) 전체 출력
-            if (showSub) {
-                validSubFlowers.forEach(f => {
-                    const cleanFlowerName = f.name.replace(/\s+/g, '').toLowerCase();
-                    const safeFlowerName = f.name.replace(/'/g, "\\'");
-                    if (query === '' || cleanMemberName.includes(query) || cleanFlowerName.includes(query)) {
-                        tagsHtml += `<span class="tag tag-sub" onclick="copyFlowerName('${safeFlowerName}')">보조: ${f.name} <span class="score-badge">${f.score}점</span></span>`;
-                    }
-                });
-            }
-
-            if (tagsHtml !== '') {
-                memberCardsHtml.push(`
-                    <div class="member-card">
-                        <div class="member-name"><span class="member-icon">🌸</span> ${member.name}</div>
-                        <div class="flower-tags">${tagsHtml}</div>
-                    </div>
-                `);
-            }
+        const scoreGroups = {};
+        owned.forEach(item => {
+            if (!scoreGroups[item.score]) scoreGroups[item.score] = [];
+            scoreGroups[item.score].push(item);
         });
 
-        if (memberCardsHtml.length > 0) {
-            listContainer.innerHTML = memberCardsHtml.join('');
-        } else {
-            listContainer.innerHTML = '<div class="loading">검색 결과가 없습니다. 🌸</div>';
+        const sortedScores = Object.keys(scoreGroups).map(Number).sort((a, b) => b - a);
+
+        let days13 = [];
+        let days45 = [];
+
+        if (sortedScores.length > 0) {
+            const topScore = sortedScores[0];
+            const topFlowers = scoreGroups[topScore];
+
+            // 1~3일차 로직: 가장 높은 꽃이 23점짜리 1~2개인 경우 -> 21점 꽃도 함께 지정
+            if (topScore === 23 && (topFlowers.length === 1 || topFlowers.length === 2) && scoreGroups[21]) {
+                days13 = [...topFlowers, ...scoreGroups[21]];
+            } else {
+                days13 = topFlowers;
+            }
+
+            // 4~5일차 로직: 다음 순위 점수 그룹을 보조꽃으로 지정
+            days45 = sortedScores.length > 1 ? scoreGroups[sortedScores[1]] : [];
         }
+
+        return { days13, days45 };
+    }
+
+    // Render Data (Strict Nickname Match vs 2-Char Min Flower Keyword Search)
+    function renderData() {
+        const day = parseInt(activeTab);
+        const sol = SOLUTIONS[day];
+
+        // 1. 공통 솔루션 상단 배치
+        const commonSolDiv = document.getElementById('common-solution');
+        commonSolDiv.innerHTML = `
+            <div class="common-solution-title"><i class="fa-solid fa-lightbulb" style="color:#ff80ab;"></i> ${sol.title}</div>
+            <div class="common-solution-body">${sol.text.replace(/\n/g, '<br>')}</div>
+            <div class="common-solution-key">${sol.key}</div>
+        `;
+
+        // 2. 닉네임별 꽃 현황 렌더링
+        const rawQuery = document.getElementById('search-input').value.trim();
+        const cleanQuery = rawQuery.replace(/\s+/g, '').toLowerCase();
+        
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.innerHTML = '';
+
+        const isHighDay = day <= 3;
+        let renderedCount = 0;
+
+        // 전체 닉네임 중 현재 검색어와 100% 완전 일치하는 닉네임이 있는지 먼저 파악
+        const isExactNickSearch = nicknames.some(nick => nick.replace(/\s+/g, '').toLowerCase() === cleanQuery);
+
+        nicknames.forEach(nick => {
+            const { days13, days45 } = getNicknameFlowerStrategy(nick);
+            const targetFlowers = isHighDay ? days13 : days45;
+            const subFlowers = isHighDay ? [] : days13;
+
+            let isMatch = false;
+
+            if (!cleanQuery) {
+                isMatch = true;
+            } else if (isExactNickSearch) {
+                // [닉네임 검색 모드] 입력어가 닉네임과 100% 일치하면 해당 닉네임 카드만 정확히 표시
+                const cleanNick = nick.replace(/\s+/g, '').toLowerCase();
+                isMatch = (cleanNick === cleanQuery);
+            } else {
+                // [꽃 이름 검색 모드] 닉네임과 일치하지 않는 검색어일 때 -> 꽃 검색은 '2자 이상'이어야 작동
+                if (cleanQuery.length >= 2) {
+                    const allDisplayFlowers = [...targetFlowers, ...subFlowers];
+                    isMatch = allDisplayFlowers.some(f => {
+                        const cleanFlowerName = f.name.replace(/\s+/g, '').toLowerCase();
+                        return cleanFlowerName.includes(cleanQuery);
+                    });
+                } else {
+                    isMatch = false; // 1자 검색어는 닉네임 미일치 시 꽃 검색 불가
+                }
+            }
+
+            if (!isMatch) {
+                return;
+            }
+
+            renderedCount++;
+
+            const card = document.createElement('div');
+            card.className = `day-card ${day >= 4 ? 'highlight' : ''}`;
+
+            let flowerHtml = '';
+            if (isHighDay) {
+                flowerHtml = `
+                    <div class="flower-list-title"><i class="fa-solid fa-crown" style="color:#ffb7b2;"></i> 지정꽃:</div>
+                    <div class="flower-chips">
+                        ${targetFlowers.length > 0 ? targetFlowers.map(f => `
+                            <button class="flower-chip" onclick="copyFlowerName('${f.name}')">
+                                🌸 ${f.name} <span class="score-tag">${f.score}점</span>
+                            </button>
+                        `).join('') : '<span style="color:var(--text-muted); font-size:0.85rem;">지정된 꽃이 없습니다.</span>'}
+                    </div>`;
+            } else {
+                flowerHtml = `
+                    <div class="flower-list-title"><i class="fa-solid fa-star" style="color:#ffb7b2;"></i> 우선 보유 꽃 (최고 점수):</div>
+                    <div class="flower-chips" style="margin-bottom:10px;">
+                        ${subFlowers.length > 0 ? subFlowers.map(f => `
+                            <button class="flower-chip" onclick="copyFlowerName('${f.name}')">
+                                👑 ${f.name} <span class="score-tag">${f.score}점</span>
+                            </button>
+                        `).join('') : '<span style="color:var(--text-muted); font-size:0.85rem;">없음</span>'}
+                    </div>
+                    <div class="flower-list-title"><i class="fa-solid fa-seedling" style="color:#7cb342;"></i> 추천 보조 꽃 (2순위 점수):</div>
+                    <div class="flower-chips">
+                        ${targetFlowers.length > 0 ? targetFlowers.map(f => `
+                            <button class="flower-chip" onclick="copyFlowerName('${f.name}')">
+                                🌼 ${f.name} <span class="score-tag">${f.score}점</span>
+                            </button>
+                        `).join('') : '<span style="color:var(--text-muted); font-size:0.85rem;">추천 보조 꽃이 없습니다.</span>'}
+                    </div>`;
+            }
+
+            card.innerHTML = `
+                <div class="day-card-header">
+                    <div class="nickname-title">${nick}</div>
+                </div>
+                ${flowerHtml}
+            `;
+            resultsDiv.appendChild(card);
+        });
+
+        if (renderedCount === 0) {
+            resultsDiv.innerHTML = `
+                <div class="empty-state">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <p>'${rawQuery}'에 해당하는 결과가 없습니다.</p>
+                </div>`;
+        }
+    }
+
+    // Filter Tab Click
+    function selectTab(tab, btn) {
+        activeTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderData();
+    }
+
+    // Copy Flower Name + Heart Emoji
+    function copyFlowerName(flowerName) {
+        const copyText = `${flowerName} ❤️`;
+        navigator.clipboard.writeText(copyText).then(() => {
+            showToast(`'${copyText}' 복사되었습니다!`);
+        }).catch(err => {
+            console.error("복사 실패:", err);
+        });
+    }
+
+    // Toast Notification Display
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toast-msg').innerText = msg;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2200);
     }
 </script>
 
